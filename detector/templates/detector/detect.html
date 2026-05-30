@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detect Attack</title>
+    <style>
+/* ===== DETECT PAGE ===== */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+}
+
+.container {
+    width: 500px;
+    padding: 40px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #00c6ff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #0072ff;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Enter System Details</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <p>1. Failed Login Attempts:</p>
+    <input type="number" name="failed_login" required>
+    <p>👉 Example: 2 (normal), 12 (attack)</p>
+
+    <p>2. Network Traffic:</p>
+    <input type="number" name="traffic" required>
+    <p>👉 Example: 200 (normal), 2000 (DoS)</p>
+
+    <p>3. Number of Requests:</p>
+    <input type="number" name="requests" required>
+    <p>👉 Example: 100 (normal), 700 (attack)</p>
+
+    <p>4. Data Transfer (MB):</p>
+    <input type="number" name="data" required>
+    <p>👉 Example: 20 (normal), 300 (Web Attack)</p>
+
+    <br><br>
+    <button type="submit">Detect Attack</button>
+
+</form>
+
+</body>
+</html>

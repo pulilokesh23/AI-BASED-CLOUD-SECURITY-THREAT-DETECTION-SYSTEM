@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Attack Detector</title>
+    <style>
+/* ===== INDEX PAGE CLEAN ===== */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(135deg, #1f4037, #99f2c8);
+    color: white;
+}
+
+/* Container */
+.container {
+    text-align: center;
+    padding: 50px;
+    width: 60%;
+    border-radius: 15px;
+
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 25px black;
+}
+
+/* Title */
+.title {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 18px;
+    color: #00ffff;
+    margin-bottom: 30px;
+}
+
+/* Button */
+.btn {
+    display: inline-block;
+    padding: 14px 28px;
+    background: #00c6ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: #0072ff;
+}
+</style>
+</head>
+<body>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+<div class="container">
+
+    <h1 class="title">
+        AI Cloud Security Network Attack Detection System
+    </h1>
+
+    <p class="subtitle">
+        Detect cyber attacks using input values
+    </p>
+
+    <a href="/detect/" class="btn">
+        🚀  Start Detection
+    </a>
+
+</div>
+
+</body>
+</html>

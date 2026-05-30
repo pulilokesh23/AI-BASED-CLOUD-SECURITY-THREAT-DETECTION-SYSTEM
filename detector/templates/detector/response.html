@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attack Details</title>
+    <style>
+/* ===== RESPONSE PAGE CLEAN LAYOUT ===== */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #232526, #414345);
+    color: white;
+}
+
+/* Main container */
+.container {
+    width: 70%;
+    margin: 60px auto;
+    padding: 40px;
+    border-radius: 15px;
+    background: rgba(0,0,0,0.7);
+    box-shadow: 0 0 25px black;
+}
+
+/* Title */
+.main-title {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+/* Attack Name */
+.attack-name {
+    text-align: center;
+    font-size: 26px;
+    color: #00e6ff;
+    margin-bottom: 30px;
+}
+
+/* Sections (Cause & Response) */
+.section {
+    margin-bottom: 25px;
+}
+
+/* Section Headings */
+.section h3 {
+    font-size: 20px;
+    color: #00ffcc;
+    margin-bottom: 10px;
+}
+
+/* Paragraph text */
+.section p {
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+/* Back link */
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    color: #00e6ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+ </style>
+</head>
+<body>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/response.css' %}">
+
+<div class="container">
+
+    <h1 class="main-title">Attack Analysis</h1>
+
+    <div class="attack-name">
+        {{ attack }}
+    </div>
+
+    <div class="section">
+        <h3>Cause:</h3>
+        <p>{{ cause }}</p>
+    </div>
+
+    <div class="section">
+        <h3>Response:</h3>
+        <p>{{ solution }}</p>
+    </div>
+
+    <a href="/" class="back-link">⬅ Back to Home</a>
+
+</div>
+</body>
+</html>
