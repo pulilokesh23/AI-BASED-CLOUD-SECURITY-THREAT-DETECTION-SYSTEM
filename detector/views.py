@@ -14,19 +14,19 @@ def detect(request):
 
         # 🔥 ATTACK LOGIC
         if failed_login > 10:
-            attack = "Brute Force Attack"
+            attack = "Brute Force Attack is detected"
 
         elif traffic > 1500 and requests_count > 600:
-            attack = "DoS Attack"
+            attack = "DoS Attack is detected "
 
         elif requests_count > 600 and traffic < 1000:
-            attack = "Port Scan Attack"
+            attack = "Port Scan Attack is detected "
 
         elif data > 200:
-            attack = "Web Attack"
+            attack = "Web Attack is detected"
 
         else:
-            attack = "Normal Activity"
+            attack = "Normal Activity is detected"
 
         return redirect(f"/result/?attack={attack}")
 
