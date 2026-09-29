@@ -1,14 +1,17 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>AI Attack Detector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <style>
 /* ===== INDEX PAGE CLEAN ===== */
 
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    height: 100vh;
+    min-height: 100vh;
 
     display: flex;
     justify-content: center;
@@ -23,6 +26,8 @@ body {
     text-align: center;
     padding: 50px;
     width: 60%;
+    max-width: 900px;
+    margin: 30px 0;
     border-radius: 15px;
 
     background: rgba(0,0,0,0.6);
@@ -57,12 +62,64 @@ body {
 .btn:hover {
     background: #0072ff;
 }
+
+/* ===== NEW: Attacks We Detect section ===== */
+.section-title {
+    font-size: 22px;
+    margin: 40px 0 6px;
+}
+
+.section-note {
+    font-size: 14px;
+    opacity: 0.75;
+    margin: 0 0 20px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.card {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border-top: 4px solid var(--accent);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.14);
+}
+
+.card h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+}
+
+.card p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.card .signal {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .container { width: 88%; padding: 30px 20px; }
+    .title { font-size: 28px; }
+}
 </style>
 </head>
 <body>
-
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/index.css' %}">
 
 <div class="container">
 
@@ -73,6 +130,36 @@ body {
     <p class="subtitle">
         Detect cyber attacks using input values
     </p>
+
+    <!-- NEW: Attacks We Detect -->
+    <h2 class="section-title">Attacks We Detect</h2>
+    <p class="section-note">Know what each attack looks like before you run a check.</p>
+
+    <div class="cards">
+        <div class="card" style="--accent:#2ecc71;">
+            <h3>Normal Traffic</h3>
+            <p>Regular activity with few failed logins and steady traffic.</p>
+            <span class="signal">Example: 2 failed logins, 200 traffic</span>
+        </div>
+
+        <div class="card" style="--accent:#f39c12;">
+            <h3>Brute Force</h3>
+            <p>Repeated password guesses trying to break into an account.</p>
+            <span class="signal">Watch: failed logins (12+)</span>
+        </div>
+
+        <div class="card" style="--accent:#e74c3c;">
+            <h3>DoS Attack</h3>
+            <p>A flood of traffic and requests that overloads the server.</p>
+            <span class="signal">Watch: traffic (2000), requests (700)</span>
+        </div>
+
+        <div class="card" style="--accent:#9b59b6;">
+            <h3>Web Attack</h3>
+            <p>Malicious requests that pull out large amounts of data.</p>
+            <span class="signal">Watch: data transfer (300 MB)</span>
+        </div>
+    </div>
 
     <a href="/detect/" class="btn">
         🚀  Start Detection
