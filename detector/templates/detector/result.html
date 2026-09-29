@@ -1,7 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/result.css' %}">
     <style>
  /* ===== RESULT PAGE ===== */
 
@@ -12,7 +15,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     color: white;
 }
 
@@ -20,6 +23,8 @@ body {
     text-align: center;
     padding: 40px;
     width: 50%;
+    max-width: 600px;
+    margin: 30px 0;
     border-radius: 15px;
     background: rgba(0,0,0,0.5);
     box-shadow: 0 0 30px black;
@@ -50,25 +55,119 @@ a:hover {
     text-decoration: underline;
 }
 
+/* ===== NEW: status banner ===== */
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.12);
+    border-left: 5px solid #95a5a6;
+}
+
+.status.safe   { background: rgba(46,204,113,0.22); border-left-color: #2ecc71; }
+.status.threat { background: rgba(231,76,60,0.25);  border-left-color: #e74c3c; }
+
+.status-icon { font-size: 24px; }
+
+/* ===== NEW: quick actions ===== */
+.view-link {
+    display: inline-block;
+    margin-bottom: 22px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.actions a,
+.actions button {
+    flex: 1 1 140px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.45);
+    background: transparent;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+.actions a:hover,
+.actions button:hover {
+    background: rgba(255,255,255,0.18);
+    text-decoration: none;
+}
+
+@media (max-width: 700px) {
+    .container { width: 88%; padding: 28px 18px; }
+}
+
 </style>
 </head>
 <body>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/result.css' %}">
 
 <div class="container">
 
     <h1 class="title">Prediction Result</h1>
 
-    <div class="attack">
+    <!-- NEW: status banner (filled in by the script below) -->
+    <div class="status" id="status">
+        <span class="status-icon" id="status-icon">🔍</span>
+        <span id="status-text">Analysing result...</span>
+    </div>
+
+    <div class="attack" id="attack">
         Attack Type: {{ attack }}
     </div>
 
-    <a href="/responce/?attack={{ attack }}" class="btn">
+    <a href="/responce/?attack={{ attack|urlencode }}" class="btn view-link">
         View Cause & Solution
     </a>
 
+    <!-- NEW: quick actions -->
+    <div class="actions">
+        <a href="/detect/">🔄 Detect Again</a>
+        <button type="button" id="copy-btn">📋 Copy Result</button>
+    </div>
+
 </div>
+
+<script>
+    const attackName = "{{ attack|escapejs }}";
+    const isSafe = attackName.toLowerCase().includes('normal');
+
+    const status = document.getElementById('status');
+    status.classList.add(isSafe ? 'safe' : 'threat');
+    document.getElementById('status-icon').textContent = isSafe ? '✅' : '⚠️';
+    document.getElementById('status-text').textContent = isSafe
+        ? 'No threat detected. Traffic looks normal.'
+        : 'Threat detected. Review the cause and solution.';
+
+    document.getElementById('copy-btn').addEventListener('click', async function () {
+        const btn = this;
+        const text = 'Prediction Result - Attack Type: ' + attackName;
+        try {
+            await navigator.clipboard.writeText(text);
+            btn.textContent = '✔ Copied';
+        } catch (e) {
+            btn.textContent = 'Copy failed';
+        }
+        setTimeout(() => { btn.textContent = '📋 Copy Result'; }, 2000);
+    });
+</script>
 
 </body>
 </html>
