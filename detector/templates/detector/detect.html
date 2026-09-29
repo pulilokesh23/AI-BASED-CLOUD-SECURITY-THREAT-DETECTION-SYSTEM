@@ -2,9 +2,10 @@
 <html>
 <head>
     <title>Detect Attack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
 /* ===== DETECT PAGE ===== */
-
+ 
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -12,40 +13,49 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     color: white;
 }
-
+ 
 .container {
     width: 500px;
+    max-width: 92vw;
+    margin: 30px 0;
     padding: 40px;
     border-radius: 15px;
     background: rgba(255,255,255,0.08);
     box-shadow: 0 0 25px rgba(0,0,0,0.6);
 }
-
+ 
 h1 {
     text-align: center;
     margin-bottom: 25px;
 }
-
+ 
 .input-group {
     margin-bottom: 18px;
 }
-
+ 
 label {
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
 }
-
+ 
+.hint {
+    font-size: 13px;
+    opacity: 0.75;
+    margin: 5px 0 0;
+}
+ 
 input {
     width: 100%;
+    box-sizing: border-box;
     padding: 10px;
     border-radius: 8px;
     border: none;
 }
-
+ 
 button {
     width: 100%;
     padding: 12px;
@@ -57,40 +67,230 @@ button {
     cursor: pointer;
     margin-top: 10px;
 }
-
+ 
 button:hover {
     background: #0072ff;
 }
-
-</style>
+ 
+/* ===== NEW: quick-fill presets ===== */
+.presets-title {
+    font-size: 14px;
+    margin: 0 0 8px;
+    opacity: 0.85;
+}
+ 
+.presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+ 
+.presets button {
+    width: auto;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    background: rgba(255,255,255,0.14);
+}
+ 
+.presets button:hover {
+    background: rgba(255,255,255,0.28);
+}
+ 
+/* ===== NEW: live risk meter ===== */
+.meter {
+    margin: 22px 0 6px;
+}
+ 
+.meter-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+ 
+.meter-track {
+    height: 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    overflow: hidden;
+}
+ 
+.meter-fill {
+    height: 100%;
+    width: 0;
+    background: #2ecc71;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+ 
+/* ===== NEW: result panel ===== */
+.result {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.12);
+    border-left: 5px solid #00c6ff;
+}
+ 
+.result.attack { border-left-color: #e74c3c; background: rgba(231,76,60,0.2); }
+.result.normal { border-left-color: #2ecc71; background: rgba(46,204,113,0.2); }
+ 
+.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4);
+    margin-top: 8px;
+}
+ 
+.secondary:hover { background: rgba(255,255,255,0.12); }
+ 
+    </style>
 </head>
 <body>
-
-<h1>Enter System Details</h1>
-
-<form method="POST">
-    {% csrf_token %}
-
-    <p>1. Failed Login Attempts:</p>
-    <input type="number" name="failed_login" required>
-    <p>👉 Example: 2 (normal), 12 (attack)</p>
-
-    <p>2. Network Traffic:</p>
-    <input type="number" name="traffic" required>
-    <p>👉 Example: 200 (normal), 2000 (DoS)</p>
-
-    <p>3. Number of Requests:</p>
-    <input type="number" name="requests" required>
-    <p>👉 Example: 100 (normal), 700 (attack)</p>
-
-    <p>4. Data Transfer (MB):</p>
-    <input type="number" name="data" required>
-    <p>👉 Example: 20 (normal), 300 (Web Attack)</p>
-
-    <br><br>
-    <button type="submit">Detect Attack</button>
-
-</form>
-
+ 
+<div class="container">
+ 
+    <h1>Enter System Details</h1>
+ 
+    <!-- NEW: quick-fill presets -->
+    <p class="presets-title">Quick fill with a sample scenario:</p>
+    <div class="presets">
+        <button type="button" data-preset="normal">Normal</button>
+        <button type="button" data-preset="brute">Brute force</button>
+        <button type="button" data-preset="dos">DoS</button>
+        <button type="button" data-preset="web">Web attack</button>
+    </div>
+ 
+    <form method="POST" id="detect-form">
+        {% csrf_token %}
+ 
+        <div class="input-group">
+            <label for="failed_login">1. Failed Login Attempts</label>
+            <input type="number" id="failed_login" name="failed_login" min="0"
+                   value="{{ request.POST.failed_login }}" required>
+            <p class="hint">👉 Example: 2 (normal), 12 (attack)</p>
+        </div>
+ 
+        <div class="input-group">
+            <label for="traffic">2. Network Traffic</label>
+            <input type="number" id="traffic" name="traffic" min="0"
+                   value="{{ request.POST.traffic }}" required>
+            <p class="hint">👉 Example: 200 (normal), 2000 (DoS)</p>
+        </div>
+ 
+        <div class="input-group">
+            <label for="requests">3. Number of Requests</label>
+            <input type="number" id="requests" name="requests" min="0"
+                   value="{{ request.POST.requests }}" required>
+            <p class="hint">👉 Example: 100 (normal), 700 (attack)</p>
+        </div>
+ 
+        <div class="input-group">
+            <label for="data">4. Data Transfer (MB)</label>
+            <input type="number" id="data" name="data" min="0"
+                   value="{{ request.POST.data }}" required>
+            <p class="hint">👉 Example: 20 (normal), 300 (Web Attack)</p>
+        </div>
+ 
+        <!-- NEW: live risk meter (browser-side preview only) -->
+        <div class="meter" aria-live="polite">
+            <div class="meter-head">
+                <span>Live risk preview</span>
+                <span id="meter-label">Enter values</span>
+            </div>
+            <div class="meter-track">
+                <div class="meter-fill" id="meter-fill"></div>
+            </div>
+        </div>
+ 
+        <button type="submit">Detect Attack</button>
+        <button type="button" class="secondary" id="reset-btn">Clear form</button>
+    </form>
+ 
+    <!-- NEW: result panel. In views.py pass e.g. {"result": "Attack Detected"} -->
+    {% if result %}
+    <div class="result {% if 'attack' in result|lower %}attack{% else %}normal{% endif %}">
+        {{ result }}
+    </div>
+    {% endif %}
+ 
+</div>
+ 
+<script>
+    const fields = ['failed_login', 'traffic', 'requests', 'data'];
+ 
+    // Attack-level values taken from the examples on this page
+    const attackLevel = { failed_login: 12, traffic: 2000, requests: 700, data: 300 };
+ 
+    const presets = {
+        normal: { failed_login: 2,  traffic: 200,  requests: 100, data: 20 },
+        brute:  { failed_login: 12, traffic: 300,  requests: 150, data: 25 },
+        dos:    { failed_login: 3,  traffic: 2000, requests: 700, data: 40 },
+        web:    { failed_login: 4,  traffic: 400,  requests: 300, data: 300 }
+    };
+ 
+    function el(id) { return document.getElementById(id); }
+ 
+    function updateMeter() {
+        let filled = 0, total = 0;
+ 
+        fields.forEach(f => {
+            const v = parseFloat(el(f).value);
+            if (!isNaN(v)) {
+                filled++;
+                total += Math.min(v / attackLevel[f], 1);
+            }
+        });
+ 
+        const fill = el('meter-fill');
+        const label = el('meter-label');
+ 
+        if (filled === 0) {
+            fill.style.width = '0';
+            label.textContent = 'Enter values';
+            return;
+        }
+ 
+        // Use the strongest signal blended with the average,
+        // so one extreme value (e.g. a DoS spike) still raises the risk.
+        const avg = total / filled;
+        let strongest = 0;
+        fields.forEach(f => {
+            const v = parseFloat(el(f).value);
+            if (!isNaN(v)) strongest = Math.max(strongest, Math.min(v / attackLevel[f], 1));
+        });
+        const pct = Math.round((0.5 * avg + 0.5 * strongest) * 100);
+ 
+        let text = 'Low', color = '#2ecc71';
+        if (pct >= 70)      { text = 'High';     color = '#e74c3c'; }
+        else if (pct >= 35) { text = 'Elevated'; color = '#f39c12'; }
+ 
+        fill.style.width = pct + '%';
+        fill.style.background = color;
+        label.textContent = text + ' (' + pct + '%)';
+    }
+ 
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const p = presets[btn.dataset.preset];
+            fields.forEach(f => { el(f).value = p[f]; });
+            updateMeter();
+        });
+    });
+ 
+    fields.forEach(f => el(f).addEventListener('input', updateMeter));
+ 
+    el('reset-btn').addEventListener('click', () => {
+        fields.forEach(f => { el(f).value = ''; });
+        updateMeter();
+    });
+ 
+    updateMeter();
+</script>
 </body>
 </html>
+ 
