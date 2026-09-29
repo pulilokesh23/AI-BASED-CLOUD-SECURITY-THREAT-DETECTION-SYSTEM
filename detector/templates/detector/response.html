@@ -1,7 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Attack Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/response.css' %}">
     <style>
 /* ===== RESPONSE PAGE CLEAN LAYOUT ===== */
 
@@ -70,20 +73,90 @@ body {
     text-decoration: underline;
 }
 
- </style>
+/* ===== NEW: severity badge ===== */
+.severity-wrap {
+    text-align: center;
+    margin: -15px 0 30px;
+}
+
+.severity {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background: #7f8c8d;
+}
+
+.severity.safe     { background: #27ae60; }
+.severity.medium   { background: #e67e22; }
+.severity.high     { background: #e74c3c; }
+.severity.critical { background: #8e1b1b; }
+
+/* ===== NEW: print report button ===== */
+.actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.print-btn {
+    padding: 11px 24px;
+    border: none;
+    border-radius: 10px;
+    background: #00c6ff;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.print-btn:hover {
+    background: #0072ff;
+}
+
+.report-date {
+    display: none;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+    .container { width: 88%; padding: 25px 18px; }
+}
+
+/* Clean black-on-white output when printing */
+@media print {
+    body { background: white; color: black; }
+    .container { width: 100%; margin: 0; padding: 0; background: none; box-shadow: none; }
+    .attack-name, .section h3 { color: black; }
+    .actions, .back-link { display: none; }
+    .report-date { display: block; }
+    .severity { border: 1px solid black; color: black; background: none !important; }
+}
+    </style>
 </head>
 <body>
-
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/response.css' %}">
 
 <div class="container">
 
     <h1 class="main-title">Attack Analysis</h1>
 
-    <div class="attack-name">
+    <div class="attack-name" id="attack-name">
         {{ attack }}
     </div>
+
+    <!-- NEW: severity badge. Optional: pass "severity" from the view
+         (Safe / Medium / High / Critical) to override the automatic level. -->
+    <div class="severity-wrap">
+        <span class="severity" id="severity" data-level="{{ severity|default:'' }}">
+            Severity: Unknown
+        </span>
+    </div>
+
+    <p class="report-date" id="report-date"></p>
 
     <div class="section">
         <h3>Cause:</h3>
@@ -95,8 +168,41 @@ body {
         <p>{{ solution }}</p>
     </div>
 
+    <!-- NEW: print / save as PDF -->
+    <div class="actions">
+        <button type="button" class="print-btn" onclick="window.print()">
+            🖨 Print / Save Report
+        </button>
+    </div>
+
     <a href="/" class="back-link">⬅ Back to Home</a>
 
 </div>
+
+<script>
+    const badge = document.getElementById('severity');
+    const attackText = document.getElementById('attack-name').textContent.toLowerCase();
+
+    // Use the level from the view if given, otherwise guess from the attack name
+    let level = badge.dataset.level.trim().toLowerCase();
+
+    if (!level) {
+        if (attackText.includes('normal'))                                level = 'safe';
+        else if (attackText.includes('brute'))                            level = 'medium';
+        else if (attackText.includes('dos') || attackText.includes('web')) level = 'high';
+    }
+
+    const labels = { safe: 'Safe', medium: 'Medium', high: 'High', critical: 'Critical' };
+
+    if (labels[level]) {
+        badge.textContent = 'Severity: ' + labels[level];
+        badge.classList.add(level);
+    }
+
+    // Date shown only on the printed report
+    document.getElementById('report-date').textContent =
+        'Report generated on ' + new Date().toLocaleString();
+</script>
+
 </body>
 </html>
